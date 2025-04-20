@@ -42,9 +42,9 @@
           }
           .file {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column; // Xếp các phần tử con theo chiều dọc
+            justify-content: center;  // Căn giữa theo trục chính (chiều dọc vì là column)
+            align-items: center;// Căn giữa theo trục phụ (chiều ngang)
             .form-control {
               display: none;
             }
