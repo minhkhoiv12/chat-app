@@ -10,7 +10,7 @@ const Login = () => {
 
   const alert = useAlert();
 
-  const { loading, authenticate, error, successMessage, myInfo } = useSelector(
+  const { authenticate, error, successMessage } = useSelector(
     (state) => state.auth
   );
 
