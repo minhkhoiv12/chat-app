@@ -1,17 +1,38 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEllipsisH, FaEdit, FaSistrix } from "react-icons/fa";
 import ActiveFriend from "./ActiveFriend";
 import Friends from "./Friends";
 import RightSide from "./RightSide";
 import { useDispatch, useSelector } from "react-redux";
 import { getFriends } from "../store/actions/messengerAction";
+
 const Messenger = () => {
+  const [currentfriend, setCurrentFriend] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+
+  const inputHendle = (e) => {
+    setNewMessage(e.target.value);
+  };
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    console.log(newMessage);
+  };
+
+  console.log(currentfriend);
+
   const { friends } = useSelector((state) => state.messenger);
   const { myInfo } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getFriends());
   }, []);
+
+  useEffect(() => {
+    if (friends && friends.length > 0) setCurrentFriend(friends[0]);
+  }, [friends]);
+
   return (
     <div className="messenger">
       <div className="row">
@@ -58,7 +79,10 @@ const Messenger = () => {
             <div className="friends">
               {friends && friends.length > 0
                 ? friends.map((fd) => (
-                    <div className="hover-friend">
+                    <div
+                      onClick={() => setCurrentFriend(fd)}
+                      className="hover-friend"
+                    >
                       <Friends friend={fd} />
                     </div>
                   ))
@@ -66,7 +90,17 @@ const Messenger = () => {
             </div>
           </div>
         </div>
-        <RightSide />
+
+        {currentfriend ? (
+          <RightSide
+            currentfriend={currentfriend}
+            inputHendle={inputHendle}
+            newMessage={newMessage}
+            sendMessage={sendMessage}
+          />
+        ) : (
+          "Please Select your Friend"
+        )}
       </div>
     </div>
   );
