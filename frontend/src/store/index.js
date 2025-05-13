@@ -13,8 +13,8 @@ const middleware = [thunkMiddleware]; // khai báo middleware
 const store = createStore(
   rootReducer, // toàn bộ reducers đã kết hợp
   compose(
-    applyMiddleware(...middleware), //Add middleware vào store (ở đây có thunkMiddleware)
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    applyMiddleware(...middleware) //Add middleware vào store (ở đây có thunkMiddleware)
+    //window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   )
 );
 
