@@ -18,6 +18,7 @@ export const getFriends = () => async (dispatch) => {
     console.log(error.response.data);
   }
 };
+
 export const messageSend = (data) => async (dispatch) => {
   try {
     const response = await axios.post("/api/messenger/send-message", data);
@@ -31,6 +32,7 @@ export const messageSend = (data) => async (dispatch) => {
     console.log(error.response.data);
   }
 };
+
 export const getMessage = (id) => {
   return async (dispatch) => {
     try {
@@ -45,4 +47,22 @@ export const getMessage = (id) => {
       console.log(error.response.data);
     }
   };
+};
+
+export const ImageMessageSend = (data) => async (dispatch) => {
+  try {
+    const response = await axios.post(
+      "/api/messenger/image-message-send",
+      data
+    );
+
+    dispatch({
+      type: MESSAGE_SEND_SUCCESS,
+      payload: {
+        message: response.data.message,
+      },
+    });
+  } catch (error) {
+    console.log(error.response.data);
+  }
 };
