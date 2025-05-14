@@ -24,13 +24,17 @@ const Messenger = () => {
   const [newMessage, setNewMessage] = useState("");
 
   const [activeUser, setActiveUser] = useState([]);
-
   const [socketMessage, setSocketMessage] = useState("");
+  const [typingMessage, setTypingMessage] = useState("");
 
   useEffect(() => {
     socket.current = io("ws://localhost:8000");
     socket.current.on("getMessage", (data) => {
       setSocketMessage(data);
+    });
+
+    socket.current.on("typingMessageGet", (data) => {
+      setTypingMessage(data);
     });
   }, []);
 
@@ -64,6 +68,12 @@ const Messenger = () => {
 
   const inputHendle = (e) => {
     setNewMessage(e.target.value);
+
+    socket.current.emit("typingMessage", {
+      senderId: myInfo.id,
+      reseverId: currentfriend._id,
+      msg: e.target.value,
+    });
   };
 
   const sendMessage = (e) => {
@@ -84,9 +94,13 @@ const Messenger = () => {
         image: "",
       },
     });
+    socket.current.emit("typingMessage", {
+      senderId: myInfo.id,
+      reseverId: currentfriend._id,
+      msg: "",
+    });
 
     dispatch(messageSend(data));
-
     setNewMessage("");
   };
 
@@ -111,12 +125,28 @@ const Messenger = () => {
 
   const emojiSend = (emu) => {
     setNewMessage(`${newMessage}` + emu);
+    socket.current.emit("typingMessage", {
+      senderId: myInfo.id,
+      reseverId: currentfriend._id,
+      msg: emu,
+    });
   };
 
   const ImageSend = (e) => {
     if (e.target.files.length !== 0) {
       const imagename = e.target.files[0].name;
       const newImageName = Date.now() + imagename;
+
+      socket.current.emit("sendMessage", {
+        senderId: myInfo.id,
+        senderName: myInfo.userName,
+        reseverId: currentfriend._id,
+        time: new Date(),
+        message: {
+          text: "",
+          image: newImageName,
+        },
+      });
 
       const formData = new FormData();
 
@@ -208,6 +238,7 @@ const Messenger = () => {
             emojiSend={emojiSend}
             ImageSend={ImageSend}
             activeUser={activeUser}
+            typingMessage={typingMessage}
           />
         ) : (
           "Please Select your Friend"
@@ -216,4 +247,5 @@ const Messenger = () => {
     </div>
   );
 };
+
 export default Messenger;
