@@ -11,11 +11,34 @@ import {
   ImageMessageSend,
 } from "../store/actions/messengerAction";
 
+import { io } from "socket.io-client";
+
 const Messenger = () => {
   const scrollRef = useRef();
+  const socket = useRef();
+
+  const { friends, message } = useSelector((state) => state.messenger);
+  const { myInfo } = useSelector((state) => state.auth);
 
   const [currentfriend, setCurrentFriend] = useState("");
   const [newMessage, setNewMessage] = useState("");
+
+  const [activeUser, setActiveUser] = useState([]);
+
+  useEffect(() => {
+    socket.current = io("ws://localhost:8000");
+  }, []);
+
+  useEffect(() => {
+    socket.current.emit("addUser", myInfo.id, myInfo);
+  }, []);
+
+  useEffect(() => {
+    socket.current.on("getUser", (users) => {
+      const filterUser = users.filter((u) => u.userId !== myInfo.id);
+      setActiveUser(filterUser);
+    });
+  }, []);
 
   const inputHendle = (e) => {
     setNewMessage(e.target.value);
@@ -32,9 +55,6 @@ const Messenger = () => {
   };
 
   console.log(currentfriend);
-
-  const { friends, message } = useSelector((state) => state.messenger);
-  const { myInfo } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -112,7 +132,14 @@ const Messenger = () => {
             </div>
 
             <div className="active-friends">
-              <ActiveFriend />
+              {activeUser && activeUser.length > 0
+                ? activeUser.map((u) => (
+                    <ActiveFriend
+                      setCurrentFriend={setCurrentFriend}
+                      user={u}
+                    />
+                  ))
+                : ""}
             </div>
 
             <div className="friends">
@@ -144,6 +171,7 @@ const Messenger = () => {
             scrollRef={scrollRef}
             emojiSend={emojiSend}
             ImageSend={ImageSend}
+            activeUser={activeUser}
           />
         ) : (
           "Please Select your Friend"
