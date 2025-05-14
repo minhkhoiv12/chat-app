@@ -249,7 +249,7 @@ const Messenger = () => {
                           : "hover-friend"
                       }
                     >
-                      <Friends friend={fd} />
+                      <Friends myId={myInfo.id} friend={fd} />
                     </div>
                   ))
                 : "No Friend"}
