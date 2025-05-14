@@ -12,7 +12,6 @@ import {
 } from "../store/actions/messengerAction";
 
 import toast, { Toaster } from "react-hot-toast";
-
 import { io } from "socket.io-client";
 import useSound from "use-sound";
 import notificationSound from "../audio/notification.mp3";
@@ -243,9 +242,9 @@ const Messenger = () => {
               {friends && friends.length > 0
                 ? friends.map((fd) => (
                     <div
-                      onClick={() => setCurrentFriend(fd)}
+                      onClick={() => setCurrentFriend(fd.fndInfo)}
                       className={
-                        currentfriend._id === fd._id
+                        currentfriend._id === fd.fndInfo._id
                           ? "hover-friend active"
                           : "hover-friend"
                       }
