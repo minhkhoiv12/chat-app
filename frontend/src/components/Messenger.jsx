@@ -10,6 +10,7 @@ import {
   getMessage,
   ImageMessageSend,
   seenMessage,
+  updateMessage,
 } from "../store/actions/messengerAction";
 
 import toast, { Toaster } from "react-hot-toast";
@@ -25,9 +26,8 @@ const Messenger = () => {
   const scrollRef = useRef();
   const socket = useRef();
 
-  const { friends, message, mesageSendSuccess } = useSelector(
-    (state) => state.messenger
-  );
+  const { friends, message, mesageSendSuccess, message_get_success } =
+    useSelector((state) => state.messenger);
   const { myInfo } = useSelector((state) => state.auth);
 
   const [currentfriend, setCurrentFriend] = useState("");
@@ -46,6 +46,31 @@ const Messenger = () => {
     socket.current.on("typingMessageGet", (data) => {
       setTypingMessage(data);
     });
+
+    socket.current.on("msgSeenResponse", (msg) => {
+      dispatch({
+        type: "SEEN_MESSAGE",
+        payload: {
+          msgInfo: msg,
+        },
+      });
+    });
+
+    socket.current.on("msgDelivaredResponse", (msg) => {
+      dispatch({
+        type: "DELIVARED_MESSAGE",
+        payload: {
+          msgInfo: msg,
+        },
+      });
+    });
+
+    socket.current.on("seenSuccess", (data) => {
+      dispatch({
+        type: "SEEN_ALL",
+        payload: data,
+      });
+    });
   }, []);
 
   useEffect(() => {
@@ -61,10 +86,12 @@ const Messenger = () => {
           },
         });
         dispatch(seenMessage(socketMessage));
+        socket.current.emit("messageSeen", socketMessage);
         dispatch({
           type: "UPDATE_FRIEND_MESSAGE",
           payload: {
             msgInfo: socketMessage,
+            status: "seen",
           },
         });
       }
@@ -91,6 +118,15 @@ const Messenger = () => {
     ) {
       notificationSPlay();
       toast.success(`${socketMessage.senderName} Send a New Message`);
+      dispatch(updateMessage(socketMessage));
+      socket.current.emit("delivaredMessage", socketMessage);
+      dispatch({
+        type: "UPDATE_FRIEND_MESSAGE",
+        payload: {
+          msgInfo: socketMessage,
+          status: "delivared",
+        },
+      });
     }
   }, [socketMessage]);
 
@@ -146,12 +182,38 @@ const Messenger = () => {
   }, []);
 
   useEffect(() => {
-    if (friends && friends.length > 0) setCurrentFriend(friends[0]);
+    if (friends && friends.length > 0) setCurrentFriend(friends[0].fndInfo);
   }, [friends]);
 
   useEffect(() => {
     dispatch(getMessage(currentfriend._id));
+    if (friends.length > 0) {
+    }
   }, [currentfriend?._id]);
+
+  useEffect(() => {
+    if (message.length > 0) {
+      if (
+        message[message.length - 1].senderId !== myInfo.id &&
+        message[message.length - 1].status !== "seen"
+      ) {
+        dispatch({
+          type: "UPDATE",
+          payload: {
+            id: currentfriend._id,
+          },
+        });
+        socket.current.emit("seen", {
+          senderId: currentfriend._id,
+          reseverId: myInfo.id,
+        });
+        dispatch(seenMessage({ _id: message[message.length - 1]._id }));
+      }
+    }
+    dispatch({
+      type: "MESSAGE_GET_SUCCESS_CLEAR",
+    });
+  }, [message_get_success]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -292,4 +354,5 @@ const Messenger = () => {
     </div>
   );
 };
+
 export default Messenger;
