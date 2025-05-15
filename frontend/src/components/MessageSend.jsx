@@ -59,6 +59,7 @@ const MessageSend = ({
       </div>
 
       <div className="file hover-gift">
+        <label htmlFor="emoji"> ❤ </label>
         <div className="add-gift">Add gift</div>
         <FaGift />
       </div>
