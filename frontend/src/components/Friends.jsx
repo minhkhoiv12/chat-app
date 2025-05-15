@@ -53,7 +53,11 @@ const Friends = (props) => {
           </div>
         ) : (
           <div className="seen-unseen-icon">
-            <div className="seen-icon"></div>
+            {msgInfo?.status !== undefined && msgInfo?.status !== "seen" ? (
+              <div className="seen-icon"> </div>
+            ) : (
+              ""
+            )}
           </div>
         )}
       </div>
