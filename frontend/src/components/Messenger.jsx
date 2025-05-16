@@ -304,16 +304,13 @@ const Messenger = () => {
               </div>
             </div>
 
-            <div className="active-friends">
-              {activeUser && activeUser.length > 0
-                ? activeUser.map((u) => (
-                    <ActiveFriend
-                      setCurrentFriend={setCurrentFriend}
-                      user={u}
-                    />
-                  ))
-                : ""}
-            </div>
+            {/* <div className='active-friends'>
+     {
+        activeUser && activeUser.length > 0 ? activeUser.map(u =>  <ActiveFriend setCurrentFriend = {setCurrentFriend} user={u} />) : ''  
+     }
+                        
+               
+               </div> */}
 
             <div className="friends">
               {friends && friends.length > 0
@@ -326,7 +323,11 @@ const Messenger = () => {
                           : "hover-friend"
                       }
                     >
-                      <Friends myId={myInfo.id} friend={fd} />
+                      <Friends
+                        activeUser={activeUser}
+                        myId={myInfo.id}
+                        friend={fd}
+                      />
                     </div>
                   ))
                 : "No Friend"}
