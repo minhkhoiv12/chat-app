@@ -19,6 +19,9 @@ const userRemove = (socketId) => {
 const findFriend = (id) => {
   return users.find((u) => u.userId === id);
 };
+const userLogout = (userId) => {
+  users = users.filter((u) => u.userId !== userId);
+};
 
 io.on("connection", (socket) => {
   console.log("Socket is connecting...");
@@ -26,6 +29,11 @@ io.on("connection", (socket) => {
     addUser(userId, socket.id, userInfo);
     io.emit("getUser", users);
   });
+  const us = users.filter((u) => u.userId !== userId);
+  const con = "new_user_add";
+  for (var i = 0; i < us.length; i++) {
+    socket.to(us[i].socketId).emit("new_user_add", con);
+  }
   socket.on("sendMessage", (data) => {
     const user = findFriend(data.reseverId);
     if (user !== undefined) {
@@ -59,6 +67,9 @@ io.on("connection", (socket) => {
         msg: data.msg,
       });
     }
+  });
+  socket.on("logout", (userId) => {
+    userLogout(userId);
   });
   socket.on("disconnect", () => {
     console.log("user is disconnect... ");
